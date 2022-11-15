@@ -1,6 +1,6 @@
 import logging
 from collections import namedtuple, defaultdict
-from enum import Enum
+from enum import IntEnum
 from itertools import product
 from gymnasium import Env
 import gymnasium as gym
@@ -9,7 +9,7 @@ from gymnasium.utils import seeding
 import numpy as np
 
 
-class Action(Enum):
+class Action(IntEnum):
     NONE = 0
     NORTH = 1
     SOUTH = 2
@@ -18,7 +18,7 @@ class Action(Enum):
     LOAD = 5
 
 
-class CellEntity(Enum):
+class CellEntity(IntEnum):
     # entity encodings for grid observations
     OUT_OF_BOUNDS = 0
     EMPTY = 1
