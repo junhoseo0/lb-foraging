@@ -62,7 +62,7 @@ class ForagingEnv(Env):
     A class that contains rules/actions for the game level-based foraging.
     """
 
-    metadata = {"render.modes": ["human"]}
+    metadata = {"render_modes": ["human"]}
 
     action_set = [Action.NORTH, Action.SOUTH, Action.WEST, Action.EAST, Action.LOAD]
     Observation = namedtuple(
@@ -85,6 +85,7 @@ class ForagingEnv(Env):
         normalize_reward=True,
         grid_observation=False,
         penalty=0.0,
+        render_mode = None,
     ):
         self.logger = logging.getLogger(__name__)
         self.players = [Player() for _ in range(players)]
@@ -110,6 +111,7 @@ class ForagingEnv(Env):
         self.action_space = gym.spaces.Tuple(tuple([gym.spaces.Discrete(6)] * len(self.players)))
         self.observation_space = gym.spaces.Tuple(tuple([self._get_observation_space()] * len(self.players)))
 
+        self.render_mode = render_mode
         self.viewer = None
 
         self.n_agents = len(self.players)
@@ -449,7 +451,6 @@ class ForagingEnv(Env):
         else:
             nobs = tuple([make_obs_array(obs) for obs in observations])
         nreward = [get_player_reward(obs) for obs in observations]
-        ndone = [obs.game_over for obs in observations]
         # ninfo = [{'observation': obs} for obs in observations]
         ninfo = {}
         
@@ -458,7 +459,10 @@ class ForagingEnv(Env):
             assert self.observation_space[i].contains(obs), \
                 f"obs space error: obs: {obs}, obs_space: {self.observation_space[i]}"
         
-        return nobs, nreward, ndone, False, ninfo
+        if self.render_mode == "human":
+            self.render()
+
+        return nobs, nreward, self.game_over, False, ninfo
 
     def reset(self, seed = None, options = None):
         super().reset(seed=seed)
@@ -475,6 +479,8 @@ class ForagingEnv(Env):
         self._gen_valid_moves()
 
         nobs, _, _, _, ninfo = self._make_gym_obs()
+        if self.render_mode == "human":
+            self.render()
         return nobs, ninfo
 
     def step(self, actions):
@@ -575,11 +581,11 @@ class ForagingEnv(Env):
         self.viewer = Viewer((self.rows, self.cols))
         self._rendering_initialized = True
 
-    def render(self, mode="human"):
+    def render(self):
         if not self._rendering_initialized:
             self._init_render()
 
-        return self.viewer.render(self, return_rgb_array=mode == "rgb_array")
+        return self.viewer.render(self, return_rgb_array=self.render_mode == "rgb_array")
 
     def close(self):
         if self.viewer:
