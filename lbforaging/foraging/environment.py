@@ -103,7 +103,6 @@ class ForagingEnv(Env):
 
         self._rendering_initialized = False
         self._valid_actions = None
-        self._max_episode_steps = max_episode_steps
 
         self._normalize_reward = normalize_reward
         self._grid_observation = grid_observation
@@ -565,9 +564,7 @@ class ForagingEnv(Env):
             # and the food is removed
             self.field[frow, fcol] = 0
 
-        self._game_over = (
-            self.field.sum() == 0 or self._max_episode_steps <= self.current_step
-        )
+        self._game_over = self.field.sum() == 0
         self._gen_valid_moves()
 
         for p in self.players:

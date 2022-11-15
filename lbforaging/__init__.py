@@ -11,6 +11,7 @@ for s, p, f, c, po in product(sizes, players, foods, coop, partial_obs):
     register(
         id="Foraging{4}-{0}x{0}-{1}p-{2}f{3}-v2".format(s, p, f, "-coop" if c else "", "-2s" if po else ""),
         entry_point="lbforaging.foraging:ForagingEnv",
+        max_episode_steps=50,
         kwargs={
             "players": p,
             "max_player_level": 3,
@@ -30,6 +31,7 @@ def grid_registration():
             register(
                 id="Foraging-grid{4}-{0}x{0}-{1}p-{2}f{3}-v2".format(s, p, f, "-coop" if c else "", "" if sight == s else f"-{sight}s"),
                 entry_point="lbforaging.foraging:ForagingEnv",
+                max_episode_steps=50,
                 kwargs={
                     "players": p,
                     "max_player_level": 3,
