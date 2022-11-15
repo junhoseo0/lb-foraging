@@ -332,7 +332,10 @@ class ForagingEnv(Env):
         )
 
     def get_valid_actions(self) -> list:
-        return list(product(*[self._valid_actions[player] for player in self.players]))
+        indices = np.zeros((self.n_agents, 6))
+        for i, player in enumerate(self.players):
+            indices[i, self._valid_actions[player]] = 1
+        return indices
 
     def _make_obs(self, player):
         return self.Observation(
