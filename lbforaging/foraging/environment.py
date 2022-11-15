@@ -451,8 +451,8 @@ class ForagingEnv(Env):
         else:
             nobs = tuple([make_obs_array(obs) for obs in observations])
         nreward = [get_player_reward(obs) for obs in observations]
-        # ninfo = [{'observation': obs} for obs in observations]
-        ninfo = {}
+        reward = np.sum(nreward)
+        info = {"nreward": nreward}
         
         # check the space of obs
         for i, obs in  enumerate(nobs):
@@ -462,7 +462,7 @@ class ForagingEnv(Env):
         if self.render_mode == "human":
             self.render()
 
-        return nobs, nreward, self.game_over, False, ninfo
+        return nobs, reward, self.game_over, False, info
 
     def reset(self, seed = None, options = None):
         super().reset(seed=seed)

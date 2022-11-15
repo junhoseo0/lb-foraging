@@ -130,14 +130,14 @@ def test_food_spawning_1():
         assert manhattan_distance(foods[1], foods[2]) > 2
 
 def test_reward_0(simple2p1f):
-    _, rewards, _, _, _ = simple2p1f.step([5, 5])
-    assert rewards[0] == 0.5
-    assert rewards[1] == 0.5
+    _, _, _, _, info = simple2p1f.step([5, 5])
+    assert info["nreward"][0] == 0.5
+    assert info["nreward"][1] == 0.5
 
 def test_reward_1(simple2p1f):
-    _, rewards, _, _, _ = simple2p1f.step([0, 5])
-    assert rewards[0] == 0
-    assert rewards[1] == 1
+    _, _, _, _, info = simple2p1f.step([0, 5])
+    assert info["nreward"][0] == 0
+    assert info["nreward"][1] == 1
 
 def test_partial_obs_1(simple2p1f_sight1):
     env = simple2p1f_sight1

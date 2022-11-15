@@ -19,6 +19,7 @@ for s, p, f, c, po in product(sizes, players, foods, coop, partial_obs):
             "sight": 2 if po else s,
             "max_episode_steps": 50,
             "force_coop": c,
+            "normalize_reward": True,
             "grid_observation": False,
         },
     )
@@ -37,6 +38,7 @@ def grid_registration():
                     "sight": sight,
                     "max_episode_steps": 50,
                     "force_coop": c,
+                    "normalize_reward": True,
                     "grid_observation": True,
                 },
             )
