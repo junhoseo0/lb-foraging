@@ -2,9 +2,9 @@ import logging
 from collections import namedtuple, defaultdict
 from enum import Enum
 from itertools import product
-from gym import Env
-import gym
-from gym.utils import seeding
+from gymnasium import Env
+import gymnasium as gym
+from gymnasium.utils import seeding
 import numpy as np
 
 
@@ -87,7 +87,6 @@ class ForagingEnv(Env):
         penalty=0.0,
     ):
         self.logger = logging.getLogger(__name__)
-        self.seed()
         self.players = [Player() for _ in range(players)]
 
         self.field = np.zeros(field_size, np.int32)
@@ -114,10 +113,6 @@ class ForagingEnv(Env):
         self.viewer = None
 
         self.n_agents = len(self.players)
-
-    def seed(self, seed=None):
-        self.np_random, seed = seeding.np_random(seed)
-        return [seed]
 
     def _get_observation_space(self):
         """The Observation Space for each agent.
@@ -253,8 +248,8 @@ class ForagingEnv(Env):
 
         while food_count < max_food and attempts < 1000:
             attempts += 1
-            row = self.np_random.randint(1, self.rows - 1)
-            col = self.np_random.randint(1, self.cols - 1)
+            row = self.np_random.integers(1, self.rows - 1)
+            col = self.np_random.integers(1, self.cols - 1)
 
             # check if it has neighbors:
             if (
@@ -267,7 +262,7 @@ class ForagingEnv(Env):
             self.field[row, col] = (
                 min_level
                 if min_level == max_level
-                else self.np_random.randint(min_level, max_level)
+                else self.np_random.integers(min_level, max_level)
             )
             food_count += 1
         self._food_spawned = self.field.sum()
@@ -288,12 +283,12 @@ class ForagingEnv(Env):
             player.reward = 0
 
             while attempts < 1000:
-                row = self.np_random.randint(0, self.rows)
-                col = self.np_random.randint(0, self.cols)
+                row = self.np_random.integers(0, self.rows)
+                col = self.np_random.integers(0, self.cols)
                 if self._is_empty_location(row, col):
                     player.setup(
                         (row, col),
-                        self.np_random.randint(1, max_player_level),
+                        self.np_random.integers(1, max_player_level),
                         self.field_size,
                     )
                     break
@@ -463,9 +458,11 @@ class ForagingEnv(Env):
             assert self.observation_space[i].contains(obs), \
                 f"obs space error: obs: {obs}, obs_space: {self.observation_space[i]}"
         
-        return nobs, nreward, ndone, ninfo
+        return nobs, nreward, ndone, False, ninfo
 
-    def reset(self):
+    def reset(self, seed = None, options = None):
+        super().reset(seed=seed)
+
         self.field = np.zeros(self.field_size, np.int32)
         self.spawn_players(self.max_player_level)
         player_levels = sorted([player.level for player in self.players])
@@ -477,8 +474,8 @@ class ForagingEnv(Env):
         self._game_over = False
         self._gen_valid_moves()
 
-        nobs, _, _, _ = self._make_gym_obs()
-        return nobs
+        nobs, _, _, _, ninfo = self._make_gym_obs()
+        return nobs, ninfo
 
     def step(self, actions):
         self.current_step += 1
