@@ -451,7 +451,10 @@ class ForagingEnv(Env):
             nobs = tuple([make_obs_array(obs) for obs in observations])
         nreward = [get_player_reward(obs) for obs in observations]
         reward = np.sum(nreward)
-        info = {"nreward": nreward}
+        info = {
+            "nreward": nreward,
+            "state": np.concatenate(nobs, axis=-1),
+        }
         
         # check the space of obs
         for i, obs in  enumerate(nobs):
