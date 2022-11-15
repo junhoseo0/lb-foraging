@@ -10,7 +10,7 @@ def manhattan_distance(x,y):
 
 @pytest.fixture
 def simple2p1f():
-    env = gym.make("Foraging-8x8-2p-1f-v2")
+    env = gym.make("Foraging-8x8-2p-1f-v2").unwrapped
     _ = env.reset()
     import time
 
@@ -24,12 +24,12 @@ def simple2p1f():
 
     env.players[0].level = 2
     env.players[1].level = 2
-    env.unwrapped._gen_valid_moves()
+    env._gen_valid_moves()
     return env
 
 @pytest.fixture
 def simple2p1f_sight1():
-    env = gym.make("Foraging-8x8-2p-1f-v2", sight=1)
+    env = gym.make("Foraging-8x8-2p-1f-v2", sight=1).unwrapped
     _ = env.reset()
     import time
 
@@ -43,12 +43,12 @@ def simple2p1f_sight1():
 
     env.players[0].level = 2
     env.players[1].level = 2
-    env.unwrapped._gen_valid_moves()
+    env._gen_valid_moves()
     return env
 
 @pytest.fixture
 def simple2p1f_sight2():
-    env = gym.make("Foraging-8x8-2p-1f-v2", sight=2)
+    env = gym.make("Foraging-8x8-2p-1f-v2", sight=2).unwrapped
     _ = env.reset()
     import time
 
@@ -62,7 +62,7 @@ def simple2p1f_sight2():
 
     env.players[0].level = 2
     env.players[1].level = 2
-    env.unwrapped._gen_valid_moves()
+    env._gen_valid_moves()
     return env
 
 

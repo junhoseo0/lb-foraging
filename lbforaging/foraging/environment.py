@@ -4,6 +4,7 @@ from enum import Enum
 from itertools import product
 from gymnasium import Env
 import gymnasium as gym
+from gymnasium.spaces import MultiDiscrete, Box
 from gymnasium.utils import seeding
 import numpy as np
 
@@ -80,7 +81,6 @@ class ForagingEnv(Env):
         field_size,
         max_food,
         sight,
-        max_episode_steps,
         force_coop,
         normalize_reward=True,
         grid_observation=False,
@@ -107,13 +107,14 @@ class ForagingEnv(Env):
         self._normalize_reward = normalize_reward
         self._grid_observation = grid_observation
 
-        self.action_space = gym.spaces.Tuple(tuple([gym.spaces.Discrete(6)] * len(self.players)))
-        self.observation_space = gym.spaces.Tuple(tuple([self._get_observation_space()] * len(self.players)))
+        self.n_agents = len(self.players)
+
+        self.action_space = MultiDiscrete([6] * self.n_agents)
+        self.observation_space = self._get_observation_space()
 
         self.render_mode = render_mode
         self.viewer = None
 
-        self.n_agents = len(self.players)
 
     def _get_observation_space(self):
         """The Observation Space for each agent.
@@ -155,7 +156,7 @@ class ForagingEnv(Env):
             min_obs = np.stack([agents_min, foods_min, access_min])
             max_obs = np.stack([agents_max, foods_max, access_max])
 
-        return gym.spaces.Box(np.array(min_obs), np.array(max_obs), dtype=np.float32)
+        return Box(np.array([min_obs] * self.n_agents), np.array([max_obs] * self.n_agents), dtype=np.float32)
 
     @classmethod
     def from_obs(cls, obs):
@@ -371,7 +372,7 @@ class ForagingEnv(Env):
 
     def _make_gym_obs(self):
         def make_obs_array(observation):
-            obs = np.zeros(self.observation_space[0].shape, dtype=np.float32)
+            obs = np.zeros(self.observation_space.shape[1], dtype=np.float32)
             # obs[: observation.field.size] = observation.field.flatten()
             # self player is always first
             seen_players = [p for p in observation.players if p.is_self] + [
@@ -446,9 +447,9 @@ class ForagingEnv(Env):
         if self._grid_observation:
             layers = make_global_grid_arrays()
             agents_bounds = [get_agent_grid_bounds(*player.position) for player in self.players]
-            nobs = tuple([layers[:, start_x:end_x, start_y:end_y] for start_x, end_x, start_y, end_y in agents_bounds])
+            nobs = np.stack([layers[:, start_x:end_x, start_y:end_y] for start_x, end_x, start_y, end_y in agents_bounds])
         else:
-            nobs = tuple([make_obs_array(obs) for obs in observations])
+            nobs = np.stack([make_obs_array(obs) for obs in observations])
         nreward = [get_player_reward(obs) for obs in observations]
         reward = np.sum(nreward)
         info = {
@@ -457,9 +458,8 @@ class ForagingEnv(Env):
         }
         
         # check the space of obs
-        for i, obs in  enumerate(nobs):
-            assert self.observation_space[i].contains(obs), \
-                f"obs space error: obs: {obs}, obs_space: {self.observation_space[i]}"
+        assert self.observation_space.contains(nobs), \
+            f"obs space error: obs: {nobs}, obs_space: {self.observation_space[i]}"
         
         if self.render_mode == "human":
             self.render()
