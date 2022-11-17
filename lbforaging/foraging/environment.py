@@ -474,6 +474,9 @@ class ForagingEnv(Env):
         super().reset(seed=seed)
 
         self.field = np.zeros(self.field_size, np.int32)
+        # Reset players position
+        for p in self.players:
+            p.position = (-1, -1)
         self.spawn_players(self.max_player_level)
         player_levels = sorted([player.level for player in self.players])
 
