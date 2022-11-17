@@ -169,3 +169,10 @@ def test_partial_obs_3(simple2p1f):
 
     assert obs[0][-2] > -1
     assert obs[1][-2] > -1
+
+
+def test_check_env():
+    from gymnasium.utils.env_checker import check_env
+
+    env = gym.make("Foraging-8x8-2p-3f-v2")
+    check_env(env)
