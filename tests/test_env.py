@@ -29,7 +29,7 @@ def simple2p1f():
 
 @pytest.fixture
 def simple2p1f_sight1():
-    env = gym.make("Foraging-8x8-2p-1f-v2", sight=1).unwrapped
+    env = gym.make("Foraging-8x8-2p-1f-v2", sight=1, normalize_obs=False).unwrapped
     _ = env.reset()
     import time
 
@@ -48,7 +48,7 @@ def simple2p1f_sight1():
 
 @pytest.fixture
 def simple2p1f_sight2():
-    env = gym.make("Foraging-8x8-2p-1f-v2", sight=2).unwrapped
+    env = gym.make("Foraging-8x8-2p-1f-v2", sight=2, normalize_obs=False).unwrapped
     _ = env.reset()
     import time
 

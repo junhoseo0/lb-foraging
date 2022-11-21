@@ -20,6 +20,7 @@ for s, p, f, c, po in product(sizes, players, foods, coop, partial_obs):
             "sight": 2 if po else s,
             "force_coop": c,
             "normalize_reward": True,
+            "normalize_obs": True,
             "grid_observation": False,
         },
     )
@@ -39,6 +40,7 @@ def grid_registration():
                     "sight": sight,
                     "force_coop": c,
                     "normalize_reward": True,
+                    "normalize_obs": True,
                     "grid_observation": True,
                 },
             )

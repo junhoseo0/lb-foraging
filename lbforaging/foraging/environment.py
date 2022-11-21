@@ -83,6 +83,7 @@ class ForagingEnv(Env):
         sight,
         force_coop,
         normalize_reward=True,
+        normalize_obs=True,
         grid_observation=False,
         penalty=0.0,
         render_mode = None,
@@ -104,13 +105,14 @@ class ForagingEnv(Env):
         self._rendering_initialized = False
         self._valid_actions = None
 
+        self._normalize_obs = normalize_obs
         self._normalize_reward = normalize_reward
         self._grid_observation = grid_observation
 
         self.n_agents = len(self.players)
 
         self.action_space = MultiDiscrete([6] * self.n_agents)
-        self.observation_space = self._get_observation_space()
+        self.observation_space = self._get_observation_space()          
 
         self.render_mode = render_mode
         self.viewer = None
@@ -155,8 +157,21 @@ class ForagingEnv(Env):
             # total layer
             min_obs = np.stack([agents_min, foods_min, access_min])
             max_obs = np.stack([agents_max, foods_max, access_max])
-
-        return Box(np.array([min_obs] * self.n_agents), np.array([max_obs] * self.n_agents), dtype=np.float32)
+        
+        if self._normalize_obs:
+            self._min_obs = np.array(min_obs, dtype=np.float32)
+            self._max_obs = np.array(max_obs, dtype=np.float32)
+            return Box(
+                np.array([np.zeros_like(min_obs)] * self.n_agents, dtype=np.float32), 
+                np.array([np.ones_like(max_obs)] * self.n_agents, dtype=np.float32), 
+                dtype=np.float32
+            )
+        else:
+            return Box(
+                np.array([min_obs] * self.n_agents, dtype=np.float32),
+                np.array([max_obs] * self.n_agents, dtype=np.float32),
+                dtype=np.float32
+            )
 
     @classmethod
     def from_obs(cls, obs):
@@ -403,6 +418,8 @@ class ForagingEnv(Env):
                 obs[self.max_food * 3 + 3 * i + 1] = p.position[1]
                 obs[self.max_food * 3 + 3 * i + 2] = p.level
 
+            if self._normalize_obs:
+                obs = (np.array(obs, dtype=np.float32) - self._min_obs) / (self._max_obs - self._min_obs)
             return obs
 
         def make_global_grid_arrays():
@@ -463,7 +480,7 @@ class ForagingEnv(Env):
         
         # check the space of obs
         assert self.observation_space.contains(nobs), \
-            f"obs space error: obs: {nobs}, obs_space: {self.observation_space[i]}"
+            f"obs space error: obs: {nobs}, obs_space: {self.observation_space}"
         
         if self.render_mode == "human":
             self.render()
