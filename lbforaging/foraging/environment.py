@@ -346,12 +346,9 @@ class ForagingEnv(Env):
             position[1] - center[1] + min(sight, center[1]),
         )
 
-    def get_valid_actions_and_mask(self):
+    def get_valid_actions(self):
         valid_actions = [self._valid_actions[p] for p in self.players]
-        mask = np.zeros((self.n_agents, 6))
-        for i, player in enumerate(self.players):
-            mask[i, self._valid_actions[player]] = 1
-        return valid_actions, mask
+        return valid_actions
 
     def _make_obs(self, player):
         return self.Observation(
@@ -474,8 +471,8 @@ class ForagingEnv(Env):
         nreward = [get_player_reward(obs) for obs in observations]
         reward = np.sum(nreward)
         info = {
-            "nreward": nreward,
             "state": np.concatenate(nobs, axis=-1),
+            "valid_acts": self.get_valid_actions(),
         }
         
         # check the space of obs
