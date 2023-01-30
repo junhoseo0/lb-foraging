@@ -611,3 +611,4 @@ class ForagingEnv(Env):
     def close(self):
         if self.viewer:
             self.viewer.close()
+            self._rendering_initialized = False
