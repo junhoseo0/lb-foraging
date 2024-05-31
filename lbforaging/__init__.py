@@ -14,7 +14,7 @@ for s, p, f, c, po in product(sizes, players, foods, coop, partial_obs):
         max_episode_steps=50,
         kwargs={
             "players": p,
-            "max_player_level": 3,
+            "max_player_level": 2,
             "field_size": (s, s),
             "max_food": f,
             "sight": 2 if po else s,
@@ -34,7 +34,7 @@ def grid_registration():
                 max_episode_steps=50,
                 kwargs={
                     "players": p,
-                    "max_player_level": 3,
+                    "max_player_level": 2,
                     "field_size": (s, s),
                     "max_food": f,
                     "sight": sight,
